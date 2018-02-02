@@ -97,4 +97,76 @@ public class DbUtil {
         }
     }
 
+    public boolean verifying(String email, String password) {
+        boolean verified = false;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.verifying);
+            preparedStatement.setString(1,email);
+            preparedStatement.setString(2,password);
+            preparedStatement.executeQuery();
+            System.out.println("Sikeres belépés");
+            verified = true;
+        } catch (SQLException e) {
+            verified = false;
+            System.out.println("Sikertelen belépés!");
+            e.printStackTrace();
+        }
+        return verified;
+    }
+
+    public void addItem(String name, int price, boolean alcoholic, int quantity, String unit) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.addItem);
+            preparedStatement.setString(1,name);
+            preparedStatement.setInt(2,price);
+            preparedStatement.setBoolean(3,alcoholic);
+            preparedStatement.setInt(4,quantity);
+            preparedStatement.setString(5,unit);
+            preparedStatement.executeUpdate();
+            System.out.println("Sikeres termék hozzáadás!");
+        } catch (SQLException e) {
+            System.out.println("Sikertelen termék hozzáadás!");
+            e.printStackTrace();
+        }
+    }
+
+    public void listAllItems() {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.getALLItems);
+            rs = preparedStatement.executeQuery();
+            System.out.print( rs.getMetaData().getColumnName(2)+" | ");
+            System.out.print( rs.getMetaData().getColumnName(3)+" | ");
+            System.out.print( rs.getMetaData().getColumnName(4)+" | ");
+            System.out.print( rs.getMetaData().getColumnName(5)+" | ");
+            System.out.println( rs.getMetaData().getColumnName(6)+"\n");
+            while (rs.next()) {
+                System.out.print(rs.getString("name")+" | ");
+                System.out.print(rs.getInt("price")+" Ft | ");
+                System.out.print(rs.getBoolean("alcoholic")+" | ");
+                System.out.print(rs.getInt("quantity")+" | ");
+                System.out.print(rs.getString("unit")+" | \n");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeItemPrice(String name, String unit, int price) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.changeItemPrice);
+            preparedStatement.setInt(1,price);
+            preparedStatement.setString(2,name);
+            preparedStatement.setString(3,unit);
+            preparedStatement.executeUpdate();
+            System.out.println("Sikeres módosítás");
+        } catch (SQLException e) {
+            System.out.println("Sikertelen módosítás!");
+            e.printStackTrace();
+        }
+    }
+
+    public void newOrder(String name, String unit, String quantity) {
+        //meg kell csinálni az User class-t hogy lekérjem egy user objectben  az összes infót a verifying-ban
+    }
+
 }
