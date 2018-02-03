@@ -1,5 +1,10 @@
 package dbTools;
 
+import Pojos.Item;
+import Pojos.Transaction;
+import Pojos.User;
+import Pojos.UserRole;
+
 import java.sql.*;
 
 public class DbUtil {
@@ -39,52 +44,52 @@ public class DbUtil {
         }
         return INSTANCE;
     }
+    /*
+        public void addUser(String name, String password, String email) {
 
-    public void addUser(String name, String password, String email) {
+            try {
+                PreparedStatement preparedStatement = dbConnection().prepareStatement(SqlConstants.newUser);
+                preparedStatement.setString(1,name);
+                preparedStatement.setString(2,password);
+                preparedStatement.setString(3,email);
+                preparedStatement.execute();
 
-        try {
-            PreparedStatement preparedStatement = dbConnection().prepareStatement(SqlConstants.newUser);
-            preparedStatement.setString(1,name);
-            preparedStatement.setString(2,password);
-            preparedStatement.setString(3,email);
-            preparedStatement.execute();
+                System.out.println("Sikeres felhasználó regisztrálás!");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Sikertelen resisztráció!");
+            }
 
-            System.out.println("Sikeres felhasználó regisztrálás!");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Sikertelen resisztráció!");
         }
 
-    }
-
-    public void setRole(int userId,int roleId) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.newRole);
-            preparedStatement.setInt(1,userId);
-            preparedStatement.setInt(2,roleId);
-            preparedStatement.executeUpdate();
-            System.out.println("Sikeres role hozzáadás!");
-        } catch (SQLException e) {
-            System.out.println("Sikertelen role hozzáadás!");
-            e.printStackTrace();
+        public void setRole(int userId,int roleId) {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.newRole);
+                preparedStatement.setInt(1,userId);
+                preparedStatement.setInt(2,roleId);
+                preparedStatement.executeUpdate();
+                System.out.println("Sikeres role hozzáadás!");
+            } catch (SQLException e) {
+                System.out.println("Sikertelen role hozzáadás!");
+                e.printStackTrace();
+            }
         }
-    }
 
-    public int getUserId(String email) {
-        int id=0;
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.getId);
-            preparedStatement.setString(1,email);
-           rs = preparedStatement.executeQuery();
-           if (rs.next()) {
-               id = rs.getInt("id");
-           }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        public int getUserId(String email) {
+            int id=0;
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.getId);
+                preparedStatement.setString(1,email);
+               rs = preparedStatement.executeQuery();
+               if (rs.next()) {
+                   id = rs.getInt("id");
+               }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return id;
         }
-        return id;
-    }
-
+    */
     public void deleteUser(String email) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.deleteUser);
@@ -97,24 +102,32 @@ public class DbUtil {
         }
     }
 
-    public boolean verifying(String email, String password) {
-        boolean verified = false;
+    public User verifying(String email, String password) {
+        User user = new User();
+        user.setId(-1);
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.verifying);
             preparedStatement.setString(1,email);
             preparedStatement.setString(2,password);
-            preparedStatement.executeQuery();
+            rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+               user.setId(rs.getInt("id"));
+               user.setEmail(rs.getString("email"));
+               user.setName(rs.getString("name"));
+               user.setPassword(rs.getString("password"));
+            }
+            if(user.getId()!=-1)
             System.out.println("Sikeres belépés");
-            verified = true;
         } catch (SQLException e) {
-            verified = false;
-            System.out.println("Sikertelen belépés!");
+            user.setId(-1);
+            System.out.println("Hiba a belépés közben!");
             e.printStackTrace();
         }
-        return verified;
+        return user;
     }
 
-    public void addItem(String name, int price, boolean alcoholic, int quantity, String unit) {
+   /* public void addItem(String name, int price, boolean alcoholic, int quantity, String unit) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.addItem);
             preparedStatement.setString(1,name);
@@ -129,7 +142,7 @@ public class DbUtil {
             e.printStackTrace();
         }
     }
-
+*/
     public void listAllItems() {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.getALLItems);
@@ -165,8 +178,86 @@ public class DbUtil {
         }
     }
 
-    public void newOrder(String name, String unit, String quantity) {
-        //meg kell csinálni az User class-t hogy lekérjem egy user objectben  az összes infót a verifying-ban
+    public void newOrder(Transaction transaction) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.newTransaction);
+            preparedStatement.setInt(1,transaction.getItemId());
+            preparedStatement.setInt(2,transaction.getQuantity());
+            preparedStatement.setString(3,transaction.getDate());
+            preparedStatement.setInt(4,transaction.getUserId());
+            preparedStatement.executeUpdate();
+            System.out.println("Sikeres rendelés!");
+        } catch (SQLException e) {
+            System.out.println("Sikertelen rendelés!");
+            e.printStackTrace();
+        }
     }
 
+    public User addUserObject(User user) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.newUser);
+            preparedStatement.setString(1,user.getName());
+            preparedStatement.setString(2,user.getPassword());
+            preparedStatement.setString(3,user.getEmail());
+            preparedStatement.executeUpdate();
+
+            PreparedStatement preparedStatement1 = connection.prepareStatement(SqlConstants.getId);
+            preparedStatement1.setString(1,user.getEmail());
+            rs = preparedStatement1.executeQuery();
+            while (rs.next()) {
+                user.setId(rs.getInt("id"));
+            }
+            System.out.println("Sikeres felhasználó regisztrálás!");
+        } catch (SQLException e) {
+            System.out.println("Sikertelen felhasználó regisztrálás!");
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
+    public void addUserRoleObject(UserRole userRole) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.newRole);
+            preparedStatement.setInt(1,userRole.getUserId());
+            preparedStatement.setInt(2,userRole.getRoleId());
+            preparedStatement.executeUpdate();
+            System.out.println("Sikeres role hozzáadás");
+        } catch (SQLException e) {
+            System.out.println("Sikertelen role hozzáadás!");
+            e.printStackTrace();
+        }
+    }
+
+    public void addItemObject(Item item) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.addItem);
+            preparedStatement.setString(1,item.getName());
+            preparedStatement.setInt(2,item.getPrice());
+            preparedStatement.setBoolean(3,item.getAlcoholic());
+            preparedStatement.setInt(4,item.getQuantity());
+            preparedStatement.setString(5,item.getUnit());
+            preparedStatement.executeUpdate();
+            System.out.println("Sikeres termék hozzáadás!");
+        } catch (SQLException e) {
+            System.out.println("Sikertelen termék hozzáadás!");
+            e.printStackTrace();
+        }
+    }
+
+    public int getItemId(String name,String unit) {
+        int id=-1;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.getItemId);
+            preparedStatement.setString(1,name);
+            preparedStatement.setString(2,unit);
+            rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                id = rs.getInt("item_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
 }

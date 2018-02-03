@@ -6,17 +6,15 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private Integer roleId;
 
     public User() {
     }
 
-    public User(Integer id, String name, String email, String password, Integer roleId) {
+    public User(Integer id, String name, String email, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.roleId = roleId;
     }
 
     public Integer getId() {
@@ -51,13 +49,6 @@ public class User {
         this.password = password;
     }
 
-    public Integer getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
-    }
 
     @Override
     public String toString() {
@@ -65,8 +56,6 @@ public class User {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", roleId=" + roleId +
-                '}';
+                ", password='" + password +'}';
     }
 }

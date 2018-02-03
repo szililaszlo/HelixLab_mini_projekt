@@ -1,5 +1,11 @@
+import Pojos.Item;
+import Pojos.Transaction;
+import Pojos.User;
+import Pojos.UserRole;
 import dbTools.DbUtil;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Main {
@@ -8,9 +14,12 @@ public class Main {
 
         DbUtil.getINSTANCE().dbConnection();
 
-        boolean verified = false;
+        int registeredId = -1;
 
-        if(verified == false) {
+        User loggedUser = new User();
+        int loggedId =-1;
+
+        if(loggedId <0) {
 
             System.out.println("Give me your email!");
             Scanner scanner = new Scanner(System.in);
@@ -18,15 +27,16 @@ public class Main {
             System.out.println("Give me your password!");
             String password = scanner.nextLine();
 
-           verified = DbUtil.getINSTANCE().verifying(email,password);
+         loggedUser = DbUtil.getINSTANCE().verifying(email,password);
+         loggedId= loggedUser.getId();
         }
 
-        if (verified == false) {
+        if (loggedId<0) {
             System.out.println("Wrong password/email!");
         }
 
         int flag = -1;
-        while (flag != 0 && verified == true) {
+        while (flag != 0 && loggedId>0) {
 
             if (flag != 1) {
                 printMenu();
@@ -42,6 +52,7 @@ public class Main {
                     printMenu();
                     break;
                 case 2:
+                    /*
                     System.out.println("Give me your name:");
                     String name = scanner.next();
                     System.out.println("Give me your password:");
@@ -60,7 +71,38 @@ public class Main {
                         flag = 1;
                     }
                     break;
+                    */
+
+                    User user = new User();
+                    System.out.println("Give me your name:");
+                    String name = scanner.next();
+                    user.setName(name);
+                    System.out.println("Give me your password:");
+                    String password = scanner.next();
+                    user.setPassword(password);
+                    System.out.println("Give me your email address:");
+                    String email = scanner.next();
+                    user.setEmail(email);
+                    DbUtil.getINSTANCE().addUserObject(user);
+
+                    registeredId = user.getId();
+
+                    System.out.println("Choose a role! Write '1' for admin, or '2' for seller, or '3' for customer");
+                    UserRole userRole = new UserRole();
+                    userRole.setRoleId( scanner.nextInt());
+                    userRole.setUserId(registeredId);
+                    if (userRole.getRoleId() < 4 && userRole.getRoleId() > 0) {
+                        DbUtil.getINSTANCE().addUserRoleObject(userRole);
+                    }
+                    else {
+                        DbUtil.getINSTANCE().deleteUser(email);
+                        flag = 1;
+                    }
+
+                    break;
+
                 case 3:
+                    /*
                     System.out.println("Give me the item name:");
                     String itemName = scanner.next();
                     System.out.println("Give me the item price:");
@@ -72,6 +114,20 @@ public class Main {
                     System.out.println("What is the unit of the item?");
                     String itemUnit = scanner.next();
                     DbUtil.getINSTANCE().addItem(itemName,itemPrice,itemAlcoholic,itemQuantity,itemUnit);
+                    */
+
+                    Item item = new Item();
+                    System.out.println("Give me the item name:");
+                    item.setName( scanner.next());
+                    System.out.println("Give me the item price:");
+                    item.setPrice(scanner.nextInt());
+                    System.out.println("The item has contains alcohol. True or false?");
+                    item.setAlcoholic(scanner.nextBoolean());
+                    System.out.println("How many item has got?");
+                    item.setQuantity(scanner.nextInt());
+                    System.out.println("What is the unit of the item?");
+                    item.setUnit(scanner.next());
+                    DbUtil.getINSTANCE().addItemObject(item);
                     break;
                 case 4:
                     DbUtil.getINSTANCE().listAllItems();
@@ -86,13 +142,22 @@ public class Main {
                     DbUtil.getINSTANCE().changeItemPrice(changeItemName,changeItemUnit,changeItemPrice);
                     break;
                 case 6:
+                    Transaction transaction = new Transaction();
                     System.out.println("Give me that item's name what are you want to order:");
                     String orderItemName = scanner.next();
-                    System.out.println("Give me that item's unit what are you want to order:");
+                    System.out.println("Give me that item's unit:");
                     String orderItemUnit = scanner.next();
+                    transaction.setItemId(DbUtil.getINSTANCE().getItemId(orderItemName,orderItemUnit));
+                    if(transaction.getItemId()==-1) {
+                        System.out.println("Ilyen termék nincs!");
+                        flag = 1;
+                        break;
+                    }
                     System.out.println("How many item would like to order?");
-                    int orderItemQuantity = scanner.nextInt();
-                    //DbUtil.getINSTANCE().newOrder();
+                    transaction.setQuantity(scanner.nextInt());
+                    transaction.setUserId(loggedId);
+                    transaction.setDate(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+                    DbUtil.getINSTANCE().newOrder(transaction);
                     break;
                 default:
                     printMenu();
@@ -109,7 +174,7 @@ public class Main {
         System.out.println("--------Új termék felvitel(3)--------");
         System.out.println("-------Termékek kilistázása(4)-------");
         System.out.println("-----------Ár módosítás(5)-----------");
-        System.out.println("----Új központi rendelés leadás(6)----");
+        System.out.println("----Új központi rendelés leadás(6)---");
     }
 
 }
