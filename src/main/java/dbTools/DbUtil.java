@@ -29,9 +29,9 @@ public class DbUtil {
         }
         try {
             connection = DriverManager.getConnection(URL,USER,PASSWORD);
-            System.out.println("Sikeres csatlakozás!");
+            System.out.println("The connection is successful!");
         } catch (SQLException e) {
-            System.out.println("Sikertelen csatlakozás!");
+            System.out.println("The connection is failed!");
             e.printStackTrace();
         }
         return connection;
@@ -50,9 +50,9 @@ public class DbUtil {
             PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.deleteUser);
             preparedStatement.setString(1,email);
             preparedStatement.executeUpdate();
-            System.out.println("Sikeres törlés!");
+            System.out.println("The delete is successful!");
         } catch (SQLException e) {
-            System.out.println("Sikertelen törlés!");
+            System.out.println("The delete is failed!");
             e.printStackTrace();
         }
     }
@@ -63,8 +63,8 @@ public class DbUtil {
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.verifying);
-            preparedStatement.setString(1,email);
-            preparedStatement.setString(2,password);
+            preparedStatement.setString(1,password);
+            preparedStatement.setString(2,email);
             rs = preparedStatement.executeQuery();
             if (rs.next()) {
                user.setId(rs.getInt("id"));
@@ -73,10 +73,10 @@ public class DbUtil {
                user.setPassword(rs.getString("password"));
             }
             if(user.getId()!=-1)
-            System.out.println("Sikeres belépés");
+            System.out.println("Welcome: " + user.getName());
         } catch (SQLException e) {
             user.setId(-1);
-            System.out.println("Hiba a belépés közben!");
+            System.out.println("Unexpected error during the login.");
             e.printStackTrace();
         }
         return user;
@@ -110,9 +110,9 @@ public class DbUtil {
             preparedStatement.setString(2,name);
             preparedStatement.setString(3,unit);
             preparedStatement.executeUpdate();
-            System.out.println("Sikeres módosítás");
+            System.out.println("The changes are saved!");
         } catch (SQLException e) {
-            System.out.println("Sikertelen módosítás!");
+            System.out.println("Unexpected error during the modification!");
             e.printStackTrace();
         }
     }
@@ -125,9 +125,9 @@ public class DbUtil {
             preparedStatement.setString(3,transaction.getDate());
             preparedStatement.setInt(4,transaction.getUserId());
             preparedStatement.executeUpdate();
-            System.out.println("Sikeres rendelés!");
+            System.out.println("Your order is saved!");
         } catch (SQLException e) {
-            System.out.println("Sikertelen rendelés!");
+            System.out.println("Unexpected error during the order!");
             e.printStackTrace();
         }
     }
@@ -146,9 +146,9 @@ public class DbUtil {
             while (rs.next()) {
                 user.setId(rs.getInt("id"));
             }
-            System.out.println("Sikeres felhasználó regisztrálás!");
+            System.out.println("Your registration is done!!");
         } catch (SQLException e) {
-            System.out.println("Sikertelen felhasználó regisztrálás!");
+            System.out.println("Your registration is failed!");
             e.printStackTrace();
         }
 
@@ -161,9 +161,9 @@ public class DbUtil {
             preparedStatement.setInt(1,userRole.getUserId());
             preparedStatement.setInt(2,userRole.getRoleId());
             preparedStatement.executeUpdate();
-            System.out.println("Sikeres role hozzáadás");
+            System.out.println("You successful give a new role!");
         } catch (SQLException e) {
-            System.out.println("Sikertelen role hozzáadás!");
+            System.out.println("Your attempt to add a new role is failed!");
             e.printStackTrace();
         }
     }
@@ -177,9 +177,9 @@ public class DbUtil {
             preparedStatement.setInt(4,item.getQuantity());
             preparedStatement.setString(5,item.getUnit());
             preparedStatement.executeUpdate();
-            System.out.println("Sikeres termék hozzáadás!");
+            System.out.println("You successful give a new item!");
         } catch (SQLException e) {
-            System.out.println("Sikertelen termék hozzáadás!");
+            System.out.println("Your attempt to give a new item is failed!");
             e.printStackTrace();
         }
     }

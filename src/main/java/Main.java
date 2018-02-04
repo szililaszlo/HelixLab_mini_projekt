@@ -56,7 +56,7 @@ public class Main {
 
                     if(loggedRole !=1) {
                         flag =1;
-                        System.out.println("Nem megfelelő jogosultság!");
+                        System.out.println("You don't have the necessary rights!");
                         break;
                     }
 
@@ -92,7 +92,7 @@ public class Main {
 
                     if(loggedRole >2) {
                         flag =1;
-                        System.out.println("Nem megfelelő jogosultság!");
+                        System.out.println("You don't have the necessary rights!");
                         break;
                     }
 
@@ -117,7 +117,7 @@ public class Main {
 
                     if(loggedRole >2) {
                         flag =1;
-                        System.out.println("Nem megfelelő jogosultság!");
+                        System.out.println("You don't have the necessary rights!");
                         break;
                     }
 
@@ -126,10 +126,14 @@ public class Main {
                     changeItemName = scanner.nextLine();
                     System.out.println("Give me that item's unit type what are gonna change:");
                     String changeItemUnit = scanner.nextLine();
-
                     System.out.println("Give me that item's new price:");
                     int changeItemPrice = scanner.nextInt();
-                    DbUtil.getINSTANCE().changeItemPrice(changeItemName,changeItemUnit,changeItemPrice);
+                    if(DbUtil.getINSTANCE().getItemId(changeItemName,changeItemUnit)>0) {
+                        DbUtil.getINSTANCE().changeItemPrice(changeItemName,changeItemUnit,changeItemPrice);
+                    }
+                    else {
+                        System.out.println("This item is not exist!");
+                    }
                     break;
                 case 6:
                     Transaction transaction = new Transaction();
@@ -138,11 +142,12 @@ public class Main {
                     orderItemName = scanner.nextLine();
                     System.out.println("Give me that item's unit:");
                     String orderItemUnit = scanner.nextLine();
-                    orderItemUnit = scanner.nextLine();
+
                     transaction.setItemId(DbUtil.getINSTANCE().getItemId(orderItemName,orderItemUnit));
                     if(transaction.getItemId()==-1) {
-                        System.out.println("Ilyen termék nincs!");
+                        System.out.println("This item is not exist!");
                         flag = 1;
+                        printMenu();
                         break;
                     }
                     System.out.println("How many item would like to order?");
