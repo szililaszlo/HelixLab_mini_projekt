@@ -15,4 +15,5 @@ public class SqlConstants {
             "VALUES ((SELECT item_id FROM items WHERE name = ? AND unit = ?),?,'order',?,?,false)";
     public final static String newTransaction = "INSERT INTO TRANSACTIONS (item_id,quantity,transaction_type,transaction_date,user_id,finished)" +
             "VALUES(?,?,'order',?,?,false)";
+    public final static String getRole = "SELECT role_id FROM user_roles WHERE user_id = ?";
 }

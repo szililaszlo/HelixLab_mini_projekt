@@ -44,52 +44,7 @@ public class DbUtil {
         }
         return INSTANCE;
     }
-    /*
-        public void addUser(String name, String password, String email) {
 
-            try {
-                PreparedStatement preparedStatement = dbConnection().prepareStatement(SqlConstants.newUser);
-                preparedStatement.setString(1,name);
-                preparedStatement.setString(2,password);
-                preparedStatement.setString(3,email);
-                preparedStatement.execute();
-
-                System.out.println("Sikeres felhasználó regisztrálás!");
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println("Sikertelen resisztráció!");
-            }
-
-        }
-
-        public void setRole(int userId,int roleId) {
-            try {
-                PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.newRole);
-                preparedStatement.setInt(1,userId);
-                preparedStatement.setInt(2,roleId);
-                preparedStatement.executeUpdate();
-                System.out.println("Sikeres role hozzáadás!");
-            } catch (SQLException e) {
-                System.out.println("Sikertelen role hozzáadás!");
-                e.printStackTrace();
-            }
-        }
-
-        public int getUserId(String email) {
-            int id=0;
-            try {
-                PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.getId);
-                preparedStatement.setString(1,email);
-               rs = preparedStatement.executeQuery();
-               if (rs.next()) {
-                   id = rs.getInt("id");
-               }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return id;
-        }
-    */
     public void deleteUser(String email) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.deleteUser);
@@ -127,22 +82,6 @@ public class DbUtil {
         return user;
     }
 
-   /* public void addItem(String name, int price, boolean alcoholic, int quantity, String unit) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.addItem);
-            preparedStatement.setString(1,name);
-            preparedStatement.setInt(2,price);
-            preparedStatement.setBoolean(3,alcoholic);
-            preparedStatement.setInt(4,quantity);
-            preparedStatement.setString(5,unit);
-            preparedStatement.executeUpdate();
-            System.out.println("Sikeres termék hozzáadás!");
-        } catch (SQLException e) {
-            System.out.println("Sikertelen termék hozzáadás!");
-            e.printStackTrace();
-        }
-    }
-*/
     public void listAllItems() {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.getALLItems);
@@ -259,5 +198,20 @@ public class DbUtil {
             e.printStackTrace();
         }
         return id;
+    }
+
+    public int getRole(int userId) {
+        int loggedUserRole =-1;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.getRole);
+            preparedStatement.setInt(1,userId);
+            rs = preparedStatement.executeQuery();
+            if(rs.next()) {
+                loggedUserRole = rs .getInt("role_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return loggedUserRole;
     }
 }
