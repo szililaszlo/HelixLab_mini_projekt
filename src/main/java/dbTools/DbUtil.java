@@ -6,6 +6,8 @@ import Pojos.User;
 import Pojos.UserRole;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DbUtil {
 
@@ -213,5 +215,25 @@ public class DbUtil {
             e.printStackTrace();
         }
         return loggedUserRole;
+    }
+
+    public List<Item> listAllItemsObject() {
+        List<Item> items = new ArrayList<Item>();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(SqlConstants.getALLItems);
+            rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                Item item = new Item();
+                item.setName(rs.getString("name"));
+                item.setPrice(rs.getInt("price"));
+                item.setAlcoholic(rs.getBoolean("alcoholic"));
+                item.setQuantity(rs.getInt("quantity"));
+                item.setUnit(rs.getString("unit"));
+                items.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return items;
     }
 }

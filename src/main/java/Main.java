@@ -4,9 +4,16 @@ import Pojos.User;
 import Pojos.UserRole;
 import dbTools.DbUtil;
 import dbTools.SqlConstants;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -156,6 +163,60 @@ public class Main {
                     transaction.setDate(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
                     DbUtil.getINSTANCE().newOrder(transaction);
                     break;
+                case 7:
+
+                    List<Item> items = DbUtil.getINSTANCE().listAllItemsObject();
+                    String[] columns = {"Name", "Price", "Alcoholic", "Quantity","Unit"};
+                    XSSFWorkbook workbook = new XSSFWorkbook();
+                    Sheet sheet = workbook.createSheet("Storage");
+
+                   Font headerFont = workbook.createFont();
+                    headerFont.setBold(true);
+
+                    CellStyle headerCellStyle = workbook.createCellStyle();
+                    headerCellStyle.setFont(headerFont);
+
+                    Row headerRow = sheet.createRow(0);
+                    for(int i = 0; i < columns.length; i++) {
+                        Cell cell = headerRow.createCell(i);
+                        cell.setCellValue(columns[i]);
+                        cell.setCellStyle(headerCellStyle);
+                    }
+
+                    int rowNum = 1;
+                    for(Item i: items) {
+                        Row row = sheet.createRow(rowNum++);
+                        row.createCell(0).setCellValue(i.getName());
+                        row.createCell(1).setCellValue(i.getPrice());
+                        row.createCell(2).setCellValue(i.getAlcoholic());
+                        row.createCell(3).setCellValue(i.getQuantity());
+                        row.createCell(4).setCellValue(i.getUnit());
+                    }
+
+                    // Resize all columns to fit the content size
+                    for(int i = 0; i < columns.length; i++) {
+                        sheet.autoSizeColumn(i);
+                    }
+
+                    // Write the output to a file
+                    FileOutputStream fileOut = null;
+                    try {
+                        fileOut = new FileOutputStream("storage.xlsx");
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            workbook.write(fileOut);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            fileOut.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
                 default:
                     printMenu();
                     break;
@@ -172,6 +233,7 @@ public class Main {
         System.out.println("-------Termékek kilistázása(4)-------");
         System.out.println("-----------Ár módosítás(5)-----------");
         System.out.println("----Új központi rendelés leadás(6)---");
+        System.out.println("---Aktuális készlet(Excel file)(7)---");
     }
 
 }
